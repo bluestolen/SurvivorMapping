@@ -1,23 +1,78 @@
-# Survivor Wilderness Map
+# SurvivorMapping
 
-Map terrain, water access, and wilderness resources.
+SurvivorMapping is a prototype for exploring terrain, water access,
+and wilderness resources in a national park. The raw-data downloader is
+available. Spatial scoring and the interactive Streamlit map are planned.
 
-## Setup
+## Installation
 
-From this directory, create and activate the Conda environment:
+Open a terminal in the repository root, where `environment.yml` is located.
+
+### Conda
+
+With Conda installed and available in your terminal, create and activate the
+Python 3.12 environment:
 
 ```sh
 conda env create --file environment.yml
-conda activate survivor-wilderness-map
+conda activate SurvivorMapping
 ```
 
-Conda resolves GDAL, GEOS, and PROJ from conda-forge alongside the pinned Python packages.
+The environment uses conda-forge for the pinned Python packages and their
+native geospatial dependencies, including GDAL, GEOS, and PROJ.
 
-For a pip-only setup, use Python 3.12 in a separate virtual environment.
-Install prebuilt wheels to avoid compiling geospatial libraries locally:
+### pip
+
+With Python 3.12 available as `python`, create a separate virtual environment:
 
 ```sh
 python -m venv .venv
-# Activate .venv for your shell before installing.
+```
+
+Activate it in Windows PowerShell with `./.venv/Scripts/Activate.ps1` or in
+macOS and Linux shells with `source .venv/bin/activate`. Then install the
+pinned packages from prebuilt wheels:
+
+```sh
 python -m pip install --only-binary=:all: -r requirements.txt
 ```
+
+After either setup, verify the package imports:
+
+```sh
+python -c "import geopandas, shapely, rasterio, pyproj, streamlit"
+```
+
+## Fetch raw park data
+
+From this directory with the project environment active, pass the park bounding
+box in WGS84 longitude and latitude order (west, south, east, north). This
+example covers an area around Yosemite Valley:
+
+```sh
+python src/backend/fetch_data.py --bbox -119.75 37.65 -119.45 37.85
+```
+
+The command writes USGS 3DEP elevation, ESA WorldCover 2021 land-cover tiles,
+and an OpenStreetMap GeoJSON to `data/raw/`. The DEM is requested at roughly
+30 m spacing or coarser to keep each dimension within 2,048 pixels. WorldCover
+tiles are downloaded intact and can extend beyond the requested bounds. The
+GeoJSON includes selected trail, water, campsite, and hut nodes and ways.
+OpenStreetMap results reflect the live database at the time of the request.
+
+Use a box no larger than 3 degrees per axis within 3DEP and WorldCover coverage.
+Successful runs replace files with matching names. WorldCover tiles from earlier
+runs may still be present.
+
+## Repository guide
+
+| Path | Contents |
+| --- | --- |
+| [docs/goals.md](docs/goals.md) | Six-week milestones, user personas, and performance benchmarks |
+| [docs/architecture.md](docs/architecture.md) | System diagram and data flow from public sources to the map |
+| [src/backend/](src/backend/) | Raw-data downloader and placeholders for spatial preparation and scoring |
+| [src/frontend/](src/frontend/) | Planned Streamlit application entry point |
+| `data/raw/` | Local GeoTIFF and GeoJSON downloads |
+| `data/processed/` | Local prepared layers and score rasters once processing is implemented |
+| `tests/` | Directory for automated tests |
+| `agents/` | Directory for agent-related project files |

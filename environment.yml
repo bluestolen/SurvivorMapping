@@ -1,4 +1,4 @@
-name: survivor-wilderness-map
+name: SurvivorMapping
 channels:
   - conda-forge
   - nodefaults
