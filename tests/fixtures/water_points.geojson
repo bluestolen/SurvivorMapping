@@ -1,0 +1,48 @@
+{
+  "type": "FeatureCollection",
+  "name": "synthetic_water_points",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "fixture_id": "water-001",
+        "name": "Mock Spring",
+        "water_type": "spring",
+        "perennial": true,
+        "source": "synthetic"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-119.6205, 37.7462]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "fixture_id": "water-002",
+        "name": "Training Creek Access",
+        "water_type": "creek_access",
+        "perennial": false,
+        "source": "synthetic"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-119.6124, 37.7528]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "fixture_id": "water-003",
+        "name": "Scenario Lake Outlet",
+        "water_type": "lake_outlet",
+        "perennial": true,
+        "source": "synthetic"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-119.6036, 37.7391]
+      }
+    }
+  ]
+}

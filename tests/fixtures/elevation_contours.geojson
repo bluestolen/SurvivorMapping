@@ -1,0 +1,60 @@
+{
+  "type": "FeatureCollection",
+  "name": "synthetic_elevation_contours",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "fixture_id": "contour-1200",
+        "elevation_m": 1200,
+        "index_contour": true,
+        "source": "synthetic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-119.6320, 37.7360],
+          [-119.6220, 37.7400],
+          [-119.6110, 37.7415],
+          [-119.5990, 37.7390]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "fixture_id": "contour-1300",
+        "elevation_m": 1300,
+        "index_contour": false,
+        "source": "synthetic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-119.6310, 37.7440],
+          [-119.6210, 37.7485],
+          [-119.6100, 37.7500],
+          [-119.5985, 37.7475]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "fixture_id": "contour-1400",
+        "elevation_m": 1400,
+        "index_contour": false,
+        "source": "synthetic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-119.6290, 37.7530],
+          [-119.6195, 37.7570],
+          [-119.6080, 37.7585],
+          [-119.5970, 37.7560]
+        ]
+      }
+    }
+  ]
+}

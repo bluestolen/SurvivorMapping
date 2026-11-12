@@ -1,0 +1,28 @@
+{
+  "type": "FeatureCollection",
+  "name": "synthetic_park_boundary",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "fixture_id": "boundary-001",
+        "park_name": "Synthetic Valley National Park",
+        "unit_code": "SYVA",
+        "boundary_type": "test_extent",
+        "source": "synthetic"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-119.6380, 37.7320],
+            [-119.5920, 37.7320],
+            [-119.5920, 37.7620],
+            [-119.6380, 37.7620],
+            [-119.6380, 37.7320]
+          ]
+        ]
+      }
+    }
+  ]
+}

@@ -1,20 +1,22 @@
-/data/raw/
-/data/processed/
-/agents/logs/
-/venv/
-/.venv/
-.env
-__pycache__/
-
-files:Plaintext# Python environments
+# Python environments
 venv/
-pycache/
+.venv/
 .env
 
+# Python cache and test artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local generated data
 data/raw/*
 data/processed/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 
+# Agent/runtime logs
+agents/logs/
+
+# OS metadata
 .DS_Store
 Thumbs.db
