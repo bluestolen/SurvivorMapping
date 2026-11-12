@@ -23,6 +23,20 @@ LAND_COVER_URL = "https://esa-worldcover.s3.eu-central-1.amazonaws.com/v200/2021
 
 
 def download(url, path, *, data=None):
+    """Download an HTTP response to a staging file.
+
+    Args:
+        url: Public endpoint or file URL.
+        path: Destination path. Each attempt overwrites the staged file.
+        data: Optional encoded POST body. If omitted, use GET.
+
+    Raises:
+        OSError: A network or file operation failed, or the response was
+            empty or did not match its declared length.
+        HTTPException: The HTTP response could not be read.
+
+    Transient failures are retried up to twice before being raised.
+    """
     request = Request(url, data=data, headers={"User-Agent": "SurvivorMapping/1.0"})
     for attempt in range(3):
         try:
@@ -46,6 +60,17 @@ def download(url, path, *, data=None):
 
 
 def validate_raster(path, *, size=None):
+    """Read all blocks of a staged GeoTIFF to check that it is usable.
+
+    Args:
+        path: Raster file to validate.
+        size: Optional expected (width, height) in pixels.
+
+    Raises:
+        ValueError: The format, georeferencing, band count, or dimensions
+            are unexpected, or every pixel is NoData.
+        rasterio.errors.RasterioError: The raster cannot be opened or read.
+    """
     with rasterio.open(path) as dataset:
         if dataset.driver != "GTiff" or dataset.crs is None or dataset.count != 1:
             raise ValueError(f"{path.name}: expected a georeferenced single-band GeoTIFF")
@@ -60,6 +85,15 @@ def validate_raster(path, *, size=None):
 
 
 def fetch_elevation(bounds, directory):
+    """Stage and validate a USGS 3DEP elevation GeoTIFF.
+
+    Args:
+        bounds: WGS84 extent in (west, south, east, north) order.
+        directory: Staging directory for elevation_3dep.tif.
+
+    Requests roughly 30-meter spacing, using coarser spacing for larger areas
+    to keep each raster dimension within 2,048 pixels.
+    """
     west, south, east, north = bounds
     width = (east - west) * 111_320 * math.cos(math.radians((south + north) / 2))
     height = (north - south) * 111_320
@@ -81,6 +115,12 @@ def fetch_elevation(bounds, directory):
 
 
 def fetch_land_cover(bounds, directory):
+    """Stage and validate the ESA WorldCover 2021 tiles intersecting an extent.
+
+    Args:
+        bounds: WGS84 extent in (west, south, east, north) order.
+        directory: Staging directory for the original 3-degree GeoTIFF tiles.
+    """
     west, south, east, north = bounds
     for lat in range(math.floor(south / 3) * 3, math.ceil(north / 3) * 3, 3):
         for lon in range(math.floor(west / 3) * 3, math.ceil(east / 3) * 3, 3):
@@ -92,7 +132,21 @@ def fetch_land_cover(bounds, directory):
 
 
 def fetch_osm(bounds, directory):
+    """Query Overpass and stage a GeoJSON FeatureCollection.
+
+    Args:
+        bounds: WGS84 extent in (west, south, east, north) order.
+        directory: Staging directory for osm_features.geojson.
+
+    Converts selected OSM nodes and ways into points, lines, or polygons
+    and retains their tags as feature properties.
+
+    Raises:
+        ValueError: The response is invalid or reports incomplete results.
+        KeyError: A required OSM element field is missing.
+    """
     west, south, east, north = bounds
+    # Overpass expects latitude before longitude in its bounding box.
     bbox = f"{south},{west},{north},{east}"
     query = f"""
 [out:json][timeout:90];
@@ -145,6 +199,14 @@ out geom;
 
 
 def main():
+    """Parse the bounding box, stage the downloads, and publish validated files.
+
+    Returns:
+        Zero on success or one if fetching, validation, or publishing fails.
+
+    Raises:
+        SystemExit: The command-line arguments are invalid or help is requested.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--bbox", nargs=4, type=float, required=True,
                         metavar=("WEST", "SOUTH", "EAST", "NORTH"))
@@ -162,6 +224,7 @@ def main():
             fetch_elevation(bounds, directory)
             fetch_land_cover(bounds, directory)
             fetch_osm(bounds, directory)
+            # Publish files only after all three sources have been validated.
             for path in sorted(directory.iterdir()):
                 path.replace(RAW / path.name)
                 print(RAW / path.name)
